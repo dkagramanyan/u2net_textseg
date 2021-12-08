@@ -1,2 +1,2 @@
-U2net for text segmentation task
-================================
+U2net for text segmentation
+===========================
