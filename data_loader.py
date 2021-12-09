@@ -1,15 +1,12 @@
 # data loader
 from __future__ import print_function, division
-import glob
+
 import torch
 from skimage import io, transform, color
 import numpy as np
 import random
-import math
-import matplotlib.pyplot as plt
+
 from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms, utils
-from PIL import Image
 
 
 # ==========================dataset load==========================
