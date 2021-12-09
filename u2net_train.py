@@ -65,8 +65,9 @@ salobj_dataset = SalObjDataset(
     lbl_name_list=tra_lbl_name_list,
     transform=transforms.Compose([
         RescaleT(320),
-        RandomCrop(288),
-        ToTensorLab(flag=0)]))
+        #     RandomCrop(288),
+        ToTensorLab(flag=0)])
+)
 
 # ------- 3. define model --------
 # define the net
