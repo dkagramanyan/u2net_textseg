@@ -3,14 +3,15 @@ import torch
 from torch.autograd import Variable
 import numpy as np
 # from model import U2NETP
-from model import U2NET
+from u2net import U2NET
 from PIL import Image
 
 # model_file = "saved_models/u2net/u2netp.pth"
-model_file = "saved_models/u2net/u2net.pth"
+model_file = 'saved_models/u2net_2021-12-16_epoch_4_train_1.0206262197535587_test_1.1388544053965013.pth'
 # filename = "test.jpg"
 filename = "http://s3.aidata.me/ailab/u_2_net_new/tsum.com/botinki/7334578_01_640_square.jpg"
-input_size = 320
+filename = "data/image/b00028.jpg"
+input_size = 500
 bg_color = (220, 30, 60)
 
 
@@ -97,7 +98,7 @@ def main():
 
     # Загружеам веса
     # В варнингах torch попросил map_location='cpu'
-    net.load_state_dict(torch.load(model_file, map_location=torch.device('cpu')))
+    net.load_state_dict(torch.load(model_file, map_location=torch.device('cuda')))
 
     # иницализация
     net.eval()
@@ -132,7 +133,7 @@ def main():
     mask = d1[:,0,:,:]
     
     # сохраняем результат
-    save_output(pillow_image, mask, "test.u2net.png")
+    save_output(pillow_image, mask, "b00028result.png")
 
     del d1,d2,d3,d4,d5,d6,d7
 
