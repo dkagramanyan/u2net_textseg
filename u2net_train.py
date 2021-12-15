@@ -65,12 +65,12 @@ model_dir = 'saved_models/'
 if not os.path.exists(model_dir):
     os.mkdir(model_dir)
 
-tra_img_name_list = glob.glob(images_path + '*')
-tra_lbl_name_list = glob.glob(masks_path + '*')
+images_path_list = glob.glob(images_path + '*')
+labels_path_list = glob.glob(masks_path + '*')
 
 salobj_dataset = SalObjDataset(
-    img_name_list=tra_img_name_list,
-    lbl_name_list=tra_lbl_name_list,
+    img_name_list=images_path_list,
+    lbl_name_list=labels_path_list,
     transform=transforms.Compose([
         RescaleT(500),
         #     RandomCrop(288),
@@ -85,6 +85,7 @@ net = U2NET(3, 1)
 net.to(device)
 
 checkpoint_name = 'u2net_2021-12-15epoch_302_train_0.000000_test_0.002015.pth'
+checkpoint_name = False
 folder_name = 'saved_models/'
 if checkpoint_name:
     net.load_state_dict(torch.load(folder_name + checkpoint_name, map_location=torch.device('cpu')))
@@ -97,7 +98,7 @@ save_frq = 1  # save the model every 2000 iterations
 epoch_num = 1000
 batch_size = 10
 test_batch_size = 10
-train_num = len(tra_img_name_list)
+train_num = len(images_path_list)
 validation_split = 0.25
 
 train_dataset_size = int(train_num * (1 - validation_split))
@@ -112,12 +113,9 @@ optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-08
 for epoch in range(0, epoch_num):
     net.train()
     train_loss = 0
-    train_step = 0
     test_loss = 0
 
     for i, train_data in enumerate(train_dataloader):
-        train_step += 1
-        # train_step_save = + 1
         start_time = time.time()
 
         train_inputs = train_data['image'].to(device)
@@ -141,9 +139,9 @@ for epoch in range(0, epoch_num):
         end_time = time.time()
         eta = (end_time - start_time) * (train_dataset_size - (i + 1) * batch_size) / batch_size
         print(
-            f"epoch: {epoch + 1}/{epoch_num} eta:{int(eta)} s batch: {(i + 1) * batch_size}/{train_dataset_size},"
-            f" loss: {train_loss / train_step} ")
-        # if train_step % save_frq == 0:
+            f"epoch: {epoch + 1}/{epoch_num} eta:{int(eta)} s batch: {(i + 1)}/{int(train_dataset_size / batch_size)},"
+            f" loss: {train_loss / (i + 1)} ")
+
     print('testing')
     with torch.no_grad():
         for j, test_data in enumerate(test_dataloader):
@@ -157,10 +155,10 @@ for epoch in range(0, epoch_num):
             test_loss += loss.data.item()
 
     print(
-        f"epoch: {epoch + 1}/{epoch_num} loss: {train_loss / train_step} test loss: {test_loss / test_dataset_size} ")
+        f"epoch: {epoch + 1}/{epoch_num} loss: {train_loss * batch_size / train_dataset_size} test loss: {test_loss * batch_size / test_dataset_size} ")
 
     torch.save(net.state_dict(),
-               model_dir + model_name + f"_epoch_{epoch}_train_{train_loss / train_step}_test_{test_loss / test_dataset_size}.pth")
+               model_dir + model_name + f"_epoch_{epoch}_train_{train_loss * batch_size / train_dataset_size}_test_{test_loss * batch_size / test_dataset_size}.pth")
     # train_loss = 0.0
     net.train()  # resume train
 #   train_step_save = 0
