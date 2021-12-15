@@ -169,17 +169,17 @@ class ToTensorLab(object):
 
             # nomalize image to range [0,1]
             tmpImg[:, :, 0] = (tmpImgt[:, :, 0] - np.min(tmpImgt[:, :, 0])) / (
-                        np.max(tmpImgt[:, :, 0]) - np.min(tmpImgt[:, :, 0]))
+                    np.max(tmpImgt[:, :, 0]) - np.min(tmpImgt[:, :, 0]))
             tmpImg[:, :, 1] = (tmpImgt[:, :, 1] - np.min(tmpImgt[:, :, 1])) / (
-                        np.max(tmpImgt[:, :, 1]) - np.min(tmpImgt[:, :, 1]))
+                    np.max(tmpImgt[:, :, 1]) - np.min(tmpImgt[:, :, 1]))
             tmpImg[:, :, 2] = (tmpImgt[:, :, 2] - np.min(tmpImgt[:, :, 2])) / (
-                        np.max(tmpImgt[:, :, 2]) - np.min(tmpImgt[:, :, 2]))
+                    np.max(tmpImgt[:, :, 2]) - np.min(tmpImgt[:, :, 2]))
             tmpImg[:, :, 3] = (tmpImgtl[:, :, 0] - np.min(tmpImgtl[:, :, 0])) / (
-                        np.max(tmpImgtl[:, :, 0]) - np.min(tmpImgtl[:, :, 0]))
+                    np.max(tmpImgtl[:, :, 0]) - np.min(tmpImgtl[:, :, 0]))
             tmpImg[:, :, 4] = (tmpImgtl[:, :, 1] - np.min(tmpImgtl[:, :, 1])) / (
-                        np.max(tmpImgtl[:, :, 1]) - np.min(tmpImgtl[:, :, 1]))
+                    np.max(tmpImgtl[:, :, 1]) - np.min(tmpImgtl[:, :, 1]))
             tmpImg[:, :, 5] = (tmpImgtl[:, :, 2] - np.min(tmpImgtl[:, :, 2])) / (
-                        np.max(tmpImgtl[:, :, 2]) - np.min(tmpImgtl[:, :, 2]))
+                    np.max(tmpImgtl[:, :, 2]) - np.min(tmpImgtl[:, :, 2]))
 
             # tmpImg = tmpImg/(np.max(tmpImg)-np.min(tmpImg))
 
@@ -205,11 +205,11 @@ class ToTensorLab(object):
             # tmpImg = tmpImg/(np.max(tmpImg)-np.min(tmpImg))
 
             tmpImg[:, :, 0] = (tmpImg[:, :, 0] - np.min(tmpImg[:, :, 0])) / (
-                        np.max(tmpImg[:, :, 0]) - np.min(tmpImg[:, :, 0]))
+                    np.max(tmpImg[:, :, 0]) - np.min(tmpImg[:, :, 0]))
             tmpImg[:, :, 1] = (tmpImg[:, :, 1] - np.min(tmpImg[:, :, 1])) / (
-                        np.max(tmpImg[:, :, 1]) - np.min(tmpImg[:, :, 1]))
+                    np.max(tmpImg[:, :, 1]) - np.min(tmpImg[:, :, 1]))
             tmpImg[:, :, 2] = (tmpImg[:, :, 2] - np.min(tmpImg[:, :, 2])) / (
-                        np.max(tmpImg[:, :, 2]) - np.min(tmpImg[:, :, 2]))
+                    np.max(tmpImg[:, :, 2]) - np.min(tmpImg[:, :, 2]))
 
             tmpImg[:, :, 0] = (tmpImg[:, :, 0] - np.mean(tmpImg[:, :, 0])) / np.std(tmpImg[:, :, 0])
             tmpImg[:, :, 1] = (tmpImg[:, :, 1] - np.mean(tmpImg[:, :, 1])) / np.std(tmpImg[:, :, 1])
@@ -234,7 +234,9 @@ class ToTensorLab(object):
         tmpImg = tmpImg.transpose((2, 0, 1))
         tmpLbl = label.transpose((2, 0, 1))
 
-        return {'imidx': torch.from_numpy(imidx), 'image': torch.from_numpy(tmpImg), 'label': torch.from_numpy(tmpLbl)}
+        return {'imidx': torch.from_numpy(imidx.astype(np.float32)),
+                'image': torch.from_numpy(tmpImg.astype(np.float32)),
+                'label': torch.from_numpy(tmpLbl.astype(np.float32))}
 
 
 class SalObjDataset(Dataset):
