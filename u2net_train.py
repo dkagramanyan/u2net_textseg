@@ -88,18 +88,16 @@ checkpoint_name = 'u2net_2021-12-15epoch_302_train_0.000000_test_0.002015.pth'
 checkpoint_name = False
 folder_name = 'saved_models/'
 if checkpoint_name:
-    net.load_state_dict(torch.load(folder_name + checkpoint_name, map_location=torch.device('cpu')))
+    net.load_state_dict(torch.load(folder_name + checkpoint_name, map_location=torch.device(device)))
 
 # ------- 4. define optimizer and train --------
 
-
-save_frq = 1  # save the model every 2000 iterations
 
 epoch_num = 1000
 batch_size = 10
 test_batch_size = 10
 train_num = len(images_path_list)
-validation_split = 0.25
+validation_split = 0.15
 
 train_dataset_size = int(train_num * (1 - validation_split))
 test_dataset_size = train_num - train_dataset_size
