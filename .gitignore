@@ -7,6 +7,8 @@ __pycache__/
 *.so
 
 /data/*
+/result/*
+/creatives/*
 /saved_models/*
 
 # Distribution / packaging
