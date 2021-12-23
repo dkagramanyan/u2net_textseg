@@ -80,7 +80,7 @@ transformed_dataset = TextSegDataset(
     transform=transforms.Compose([
         RescaleT(700),
         # T.ColorJitter(brightness=.5, contrast=.5, saturation=.5, hue=.5),
-         T.RandomHorizontalFlip(p=0.5),
+        T.RandomHorizontalFlip(p=0.5),
         # T.RandomVerticalFlip(p=0.5),
         # T.RandomRotation(degrees=(0, 180)),
         ToTensorLab()]
@@ -94,7 +94,7 @@ augmented_dataset = original_dataset + transformed_dataset
 net = U2NET(3, 1)
 net.to(device)
 
-checkpoint_name = 'u2net_2021-12-15epoch_302_train_0.000000_test_0.002015.pth'
+checkpoint_name = 'u2net_2021-12-16_epoch_19_train_0.7557503520919565_test_0.7732233350837467.pth'
 checkpoint_name = False
 folder_name = 'saved_models_rf/'
 if checkpoint_name:
@@ -109,8 +109,8 @@ test_batch_size = 20
 train_num = len(images_path_list)
 validation_split = 0.15
 
-train_dataset_size = int(2*train_num * (1 - validation_split))
-test_dataset_size = 2*train_num - train_dataset_size
+train_dataset_size = int(2 * train_num * (1 - validation_split))
+test_dataset_size = 2 * train_num - train_dataset_size
 
 train_dataset, test_dataset = torch.utils.data.random_split(augmented_dataset, (train_dataset_size, test_dataset_size))
 
