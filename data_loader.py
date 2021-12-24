@@ -8,6 +8,7 @@ import math
 import matplotlib.pyplot as plt
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils
+from torch.autograd import Variable
 import torchvision.transforms as T
 from PIL import Image
 
@@ -201,14 +202,14 @@ def make_affine(image, mask):
     '''
 
     # угол наклона
-    angle = np.random.randint(-45, 45)
+    angle = np.random.randint(-15, 15)
 
     # сдвиг по оси х и у
-    translate = (np.random.randint(-image.size()[0] // 4, image.size()[0] // 4),
-                 np.random.randint(-image.size()[1] // 4, image.size()[1] // 4))
+    translate = (np.random.randint(-image.size()[0] // 3, image.size()[0] // 3),
+                 np.random.randint(-image.size()[1] // 3, image.size()[1] // 3))
 
     # приближение
-    scale = np.random.uniform(0.3, 1)
+    scale = np.random.uniform(0.35, 1)
 
     # диагональное растяжение
     shear = (1, 1)
@@ -244,7 +245,7 @@ def random_flip(img, mask):
 
 
 class TextSegDataset(Dataset):
-    def __init__(self, images_paths, masks_path, img_size=700, transform=False):
+    def __init__(self, images_paths, masks_path, img_size=500, transform=False):
         super().__init__()
         self.images_paths = images_paths
         self.masks_paths = masks_path
@@ -268,4 +269,9 @@ class TextSegDataset(Dataset):
             image, mask = make_affine(image, mask)
             image, mask = random_color_jitter(image, mask)
 
-        return {'image': image, 'mask': T.Grayscale(num_output_channels=1)(mask)}
+        mask = T.Grayscale(num_output_channels=1)(mask)
+
+        image = Variable(image, requires_grad=False)
+        mask = Variable(mask, requires_grad=False)
+
+        return {'image': image, 'mask': mask}
