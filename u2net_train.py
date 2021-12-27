@@ -8,20 +8,15 @@ import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils
 import torch.optim as optim
-import torchvision.transforms as standard_transforms
-
+import torchvision.transforms as T
+from skimage import io, transform
 from sklearn.model_selection import train_test_split
 
 import numpy as np
 import glob
 import os
 
-from data_loader import Rescale
-from data_loader import RescaleT
-from data_loader import RandomCrop
-from data_loader import ToTensor
-from data_loader import ToTensorLab
-from data_loader import SalObjDataset
+from data_loader import TextSegDataset, ToTensorLab, RescaleT, RandomCrop
 
 from u2net import U2NET
 
@@ -60,7 +55,7 @@ model_name = f'u2net_{datetime.datetime.now().date()}'
 images_path = 'data/image/'
 masks_path = 'data/semantic_label/'
 
-model_dir = 'saved_models/'
+model_dir = 'saved_models_rf/'
 
 if not os.path.exists(model_dir):
     os.mkdir(model_dir)
@@ -68,47 +63,62 @@ if not os.path.exists(model_dir):
 images_path_list = glob.glob(images_path + '*')
 labels_path_list = glob.glob(masks_path + '*')
 
-salobj_dataset = SalObjDataset(
+print('main dataset')
+original_dataset = TextSegDataset(
     img_name_list=images_path_list,
     lbl_name_list=labels_path_list,
     transform=transforms.Compose([
-        RescaleT(500),
-        #     RandomCrop(288),
-
-        ToTensorLab(flag=0)]
+        RescaleT(700),
+        # RandomCrop(288),
+        ToTensorLab()]
     )
 )
+print('transformed dataset')
+transformed_dataset = TextSegDataset(
+    img_name_list=images_path_list,
+    lbl_name_list=labels_path_list,
+    transform=transforms.Compose([
+        RescaleT(700),
+        # T.ColorJitter(brightness=.5, contrast=.5, saturation=.5, hue=.5),
+        T.RandomHorizontalFlip(p=0.5),
+        # T.RandomVerticalFlip(p=0.5),
+        # T.RandomRotation(degrees=(0, 180)),
+        ToTensorLab()]
+    )
+)
+
+augmented_dataset = original_dataset + transformed_dataset
 
 # ------- 3. define model --------
 # define the net
 net = U2NET(3, 1)
 net.to(device)
 
-checkpoint_name = 'u2net_2021-12-15epoch_302_train_0.000000_test_0.002015.pth'
+checkpoint_name = 'u2net_2021-12-16_epoch_19_train_0.7557503520919565_test_0.7732233350837467.pth'
 checkpoint_name = False
-folder_name = 'saved_models/'
+folder_name = 'saved_models_rf/'
 if checkpoint_name:
-    net.load_state_dict(torch.load(folder_name + checkpoint_name, map_location=torch.device('cpu')))
+    net.load_state_dict(torch.load(folder_name + checkpoint_name, map_location=torch.device(device)))
 
 # ------- 4. define optimizer and train --------
 
 
-save_frq = 1  # save the model every 2000 iterations
-
 epoch_num = 1000
-batch_size = 10
-test_batch_size = 10
+batch_size = 17
+test_batch_size = 20
 train_num = len(images_path_list)
-validation_split = 0.25
+validation_split = 0.15
 
-train_dataset_size = int(train_num * (1 - validation_split))
-test_dataset_size = train_num - train_dataset_size
-train_dataset, test_dataset = torch.utils.data.random_split(salobj_dataset, (train_dataset_size, test_dataset_size))
+train_dataset_size = int(2 * train_num * (1 - validation_split))
+test_dataset_size = 2 * train_num - train_dataset_size
+
+train_dataset, test_dataset = torch.utils.data.random_split(augmented_dataset, (train_dataset_size, test_dataset_size))
 
 train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=1)
 test_dataloader = DataLoader(test_dataset, batch_size=test_batch_size, shuffle=True, num_workers=1)
 
-optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-08, weight_decay=0)
+# optimizer = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-08, weight_decay=0)
+optimizer = optim.RMSprop(net.parameters(), lr=0.001, eps=1e-08, weight_decay=0)
 
 for epoch in range(0, epoch_num):
     net.train()

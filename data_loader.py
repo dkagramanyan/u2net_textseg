@@ -239,7 +239,7 @@ class ToTensorLab(object):
                 'label': torch.from_numpy(tmpLbl.astype(np.float32))}
 
 
-class SalObjDataset(Dataset):
+class TextSegDataset(Dataset):
     def __init__(self, img_name_list, lbl_name_list, transform=None):
         # self.root_dir = root_dir
         # self.image_name_list = glob.glob(image_dir+'*.png')
