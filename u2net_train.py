@@ -68,26 +68,26 @@ original_dataset = TextSegDataset(
     img_name_list=images_path_list,
     lbl_name_list=labels_path_list,
     transform=transforms.Compose([
-        RescaleT(700),
+        RescaleT(500),
         # RandomCrop(288),
         ToTensorLab()]
     )
 )
-print('transformed dataset')
-transformed_dataset = TextSegDataset(
-    img_name_list=images_path_list,
-    lbl_name_list=labels_path_list,
-    transform=transforms.Compose([
-        RescaleT(700),
-        # T.ColorJitter(brightness=.5, contrast=.5, saturation=.5, hue=.5),
-        T.RandomHorizontalFlip(p=0.5),
-        # T.RandomVerticalFlip(p=0.5),
-        # T.RandomRotation(degrees=(0, 180)),
-        ToTensorLab()]
-    )
-)
+# print('transformed dataset')
+# transformed_dataset = TextSegDataset(
+#     img_name_list=images_path_list,
+#     lbl_name_list=labels_path_list,
+#     transform=transforms.Compose([
+#         RescaleT(700),
+#         # T.ColorJitter(brightness=.5, contrast=.5, saturation=.5, hue=.5),
+#         T.RandomHorizontalFlip(p=0.5),
+#         # T.RandomVerticalFlip(p=0.5),
+#         # T.RandomRotation(degrees=(0, 180)),
+#         ToTensorLab()]
+#     )
+# )
 
-augmented_dataset = original_dataset + transformed_dataset
+augmented_dataset = original_dataset
 
 # ------- 3. define model --------
 # define the net
@@ -104,13 +104,13 @@ if checkpoint_name:
 
 
 epoch_num = 1000
-batch_size = 17
+batch_size = 8
 test_batch_size = 20
 train_num = len(images_path_list)
 validation_split = 0.15
 
-train_dataset_size = int(2 * train_num * (1 - validation_split))
-test_dataset_size = 2 * train_num - train_dataset_size
+train_dataset_size = int(1 * train_num * (1 - validation_split))
+test_dataset_size = 1 * train_num - train_dataset_size
 
 train_dataset, test_dataset = torch.utils.data.random_split(augmented_dataset, (train_dataset_size, test_dataset_size))
 
