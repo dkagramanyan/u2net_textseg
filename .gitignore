@@ -10,6 +10,8 @@ __pycache__/
 /result/*
 /creatives/*
 /saved_models/*
+/saved_models_rg/*
+/saved_models_rf/*
 
 # Distribution / packaging
 .Python
