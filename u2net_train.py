@@ -18,7 +18,7 @@ import os
 
 from data_loader import TextSegDataset, ToTensorLab, RescaleT, RandomCrop
 
-from u2net import U2NET
+from u2net_pt import U2NET
 
 import time
 import datetime
